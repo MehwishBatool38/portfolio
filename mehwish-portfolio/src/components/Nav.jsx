@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 
-export default function Nav({ active, page, onPageChange }) {
+export default function Nav({ info, active, page, onPageChange }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const getInitials = (name) => {
+    if (!name) return "MB";
+    return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+  };
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60);
@@ -45,9 +50,9 @@ export default function Nav({ active, page, onPageChange }) {
             width:36, height:36, background:"var(--ink)",
             display:"flex", alignItems:"center", justifyContent:"center",
             fontFamily:"var(--font-display)", fontSize:14, color:"var(--cream)", letterSpacing:"0.05em",
-          }}>MB</div>
+          }}>{getInitials(info?.name)}</div>
           <span className="nav-name" style={{ fontFamily:"var(--font-body)", fontWeight:600, fontSize:14, color:"var(--ink)", letterSpacing:"0.04em" }}>
-            Mehwish Batool
+            {info?.name || "Mehwish Batool"}
           </span>
         </button>
 

@@ -355,21 +355,29 @@ export default function App() {
   const [info, setInfo] = useState(DEFAULT_INFO);
   const [projects, setProjects] = useState([]);
 
+  const loadData = async () => {
+    const [prof, web, app] = await Promise.all([
+      getProfile(), getProjects("web"), getProjects("app"),
+    ]);
+    if (prof) setInfo(prof);
+    const allProjects = [
+      ...app.map(p => ({ ...p, type: "app" })),
+      ...web.map(p => ({ ...p, type: "web" }))
+    ].sort((a, b) => parseInt(b.year || 0) - parseInt(a.year || 0));
+    
+    setProjects(allProjects.length > 0 ? allProjects : DEFAULT_PROJECTS);
+  };
+
   useEffect(() => {
-    async function load() {
-      const [prof, web, app] = await Promise.all([
-        getProfile(), getProjects("web"), getProjects("app"),
-      ]);
-      if (prof) setInfo(prof);
-      const allProjects = [
-        ...app.map(p => ({ ...p, type: "app" })),
-        ...web.map(p => ({ ...p, type: "web" }))
-      ].sort((a, b) => parseInt(b.year || 0) - parseInt(a.year || 0));
-      
-      setProjects(allProjects.length > 0 ? allProjects : DEFAULT_PROJECTS);
-    }
-    load();
+    loadData();
   }, []);
+
+  // Re-fetch data when returning to home page
+  useEffect(() => {
+    if (page === "home") {
+      loadData();
+    }
+  }, [page]);
 
   useEffect(() => {
     if (page !== "home") return;
@@ -422,7 +430,7 @@ export default function App() {
       <style>{CSS}</style>
       <div id="cur-dot" className="cursor-dot" />
       <div id="cur-ring" className="cursor-ring" />
-      <Nav active={active} page={page} onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0 }); }} />
+      <Nav info={info} active={active} page={page} onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0 }); }} />
 
       {page === "home" && (
         <main>
@@ -433,7 +441,7 @@ export default function App() {
           <Contact info={info} />
         </main>
       )}
-      {page === "admin" && <AdminPage onBack={() => { setPage("home"); window.scrollTo({ top: 0 }); }} />}
+      {page === "admin" && <AdminPage onBack={() => { setPage("home"); }} />}
       {page === "home" && <Footer info={info} />}
 
       {showTop && (

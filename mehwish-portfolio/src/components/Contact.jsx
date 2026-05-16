@@ -5,8 +5,8 @@ export default function Contact({ info }) {
   const WHATSAPP = "923197420679";
 
   const openWA = () => {
-    const msg = encodeURIComponent(`Hi Mehwish! I'm ${form.name||"a visitor"} (${form.email||"no email"}). ${form.message||"I want to discuss a project."}`);
-    window.open(`https://wa.me/${WHATSAPP}?text=${msg}`, "_blank");
+    const msg = encodeURIComponent(`Hi ${info?.name?.split(" ")[0] || "Mehwish"}! I'm ${form.name||"a visitor"} (${form.email||"no email"}). ${form.message||"I want to discuss a project."}`);
+    window.open(`https://wa.me/${info?.phone || "923197420679"}?text=${msg}`, "_blank");
   };
 
   return (
@@ -32,7 +32,7 @@ export default function Contact({ info }) {
                 { label:"LinkedIn",   val:"Professional Network",  href: info?.linkedin,  icon:"🔗" },
                 { label:"Instagram",  val:"Personal Updates",      href: info?.instagram, icon:"📸" },
                 { label:"Facebook",   val:"Connect on FB",         href: info?.facebook,  icon:"👤" },
-                { label:"WhatsApp",   val:"Quick Chat",            href:`https://wa.me/${WHATSAPP}`,icon:"💬" },
+                { label:"WhatsApp",   val:"Quick Chat",            href:`https://wa.me/${info?.phone || "923197420679"}`,icon:"💬" },
                 { label: info?.email, val:"Direct Email",          href:`mailto:${info?.email}`,   icon:"✉" },
               ].map((s, i) => (
                 <a key={i} href={s.href} target="_blank" rel="noreferrer"

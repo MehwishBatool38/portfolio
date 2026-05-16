@@ -62,7 +62,7 @@ export default function Hero({ info }) {
             </div>
 
             <h1 className="display rv" style={{ marginBottom:24, whiteSpace: "nowrap" }}>
-              MEHWISH <span className="red">BATOOL</span>
+               {info?.name?.toUpperCase()?.split(" ")[0] || "MEHWISH"} <span className="red">{info?.name?.toUpperCase()?.split(" ")[1] || "BATOOL"}</span>
             </h1>
 
             <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:32 }} className="rv rv-d1">
@@ -101,7 +101,7 @@ export default function Hero({ info }) {
                 { label:"LinkedIn",  href: info?.linkedin,  icon:"🔗" },
                 { label:"Instagram", href: info?.instagram, icon:"📸" },
                 { label:"Facebook",  href: info?.facebook,  icon:"👤" },
-                { label:"WhatsApp",  href: `https://wa.me/923197420679`, icon:"💬" },
+                { label:"WhatsApp",  href: `https://wa.me/${info?.phone || "923197420679"}`, icon:"💬" },
               ].map(s => (
                 <a key={s.label} href={s.href} target="_blank" rel="noreferrer"
                   style={{ 

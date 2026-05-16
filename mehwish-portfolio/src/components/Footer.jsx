@@ -5,10 +5,10 @@ export default function Footer({ info }) {
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:48, flexWrap:"wrap", gap:32 }}>
           <div>
             <div style={{ fontFamily:"var(--font-display)", fontSize:48, color:"var(--cream)", lineHeight:0.9, letterSpacing:"0.02em", marginBottom:16 }}>
-              MEHWISH<br/><span style={{ color:"var(--red)" }}>BATOOL</span>
+              {(info?.name || "MEHWISH BATOOL").toUpperCase().split(" ")[0]}<br/><span style={{ color:"var(--red)" }}>{(info?.name || "MEHWISH BATOOL").toUpperCase().split(" ")[1]}</span>
             </div>
             <div style={{ fontSize:12, color:"rgba(245,240,232,0.35)", maxWidth:240, lineHeight:1.7 }}>
-              Web & Mobile App Developer | UI/UX Designer<br/>Vehari, Pakistan
+              {info?.tagline || "Web & Mobile App Developer | UI/UX Designer"}<br/>{info?.location || "Vehari, Pakistan"}
             </div>
           </div>
 
@@ -41,7 +41,7 @@ export default function Footer({ info }) {
         </div>
 
         <div style={{ borderTop:"1px solid rgba(255,255,255,0.06)", paddingTop:24, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12 }}>
-          <span style={{ fontSize:11, color:"rgba(245,240,232,0.25)" }}>© 2026 Mehwish Batool — All Rights Reserved</span>
+          <span style={{ fontSize:11, color:"rgba(245,240,232,0.25)" }}>© {new Date().getFullYear()} {info?.name || "Mehwish Batool"} — All Rights Reserved</span>
           <span style={{ fontSize:11, color:"rgba(245,240,232,0.25)" }}>Built with React & passion</span>
         </div>
       </div>
