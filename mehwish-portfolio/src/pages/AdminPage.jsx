@@ -92,6 +92,26 @@ const ADMIN_CSS = `
 }
 
 /* mobile admin */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--ink); color: var(--cream);
+  padding: 12px 24px; border-radius: 10px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  border: none; cursor: pointer; transition: all 0.2s;
+}
+.btn-primary:hover { background: var(--red); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: var(--cream2); color: var(--ink);
+  padding: 12px 24px; border-radius: 10px;
+  font-family: var(--font-body); font-size: 13px; font-weight: 600;
+  border: 1px solid var(--border); cursor: pointer; transition: all 0.2s;
+}
+.btn-secondary:hover { background: var(--border); }
+.btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
+
 @media (max-width: 768px) {
   .admin-sidebar { display:none; }
   .admin-mobile-nav {
