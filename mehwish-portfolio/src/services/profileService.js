@@ -9,10 +9,17 @@ export async function getProfile() {
   return data;
 }
 
+function cleanProfile(profile) {
+  const { created_at, updated_at, ...profileData } = profile;
+  return Object.fromEntries(
+    Object.entries({ ...profileData, id: 1 }).filter(([, value]) => value !== undefined)
+  );
+}
+
 export async function updateProfile(profile) {
   const { data, error } = await supabase
     .from("profiles")
-    .upsert({ ...profile, id: 1 })
+    .upsert(cleanProfile(profile))
     .select()
     .single();
   if (error) throw error;

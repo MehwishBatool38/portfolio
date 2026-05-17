@@ -11,7 +11,7 @@ export default function Projects({ projects }) {
 
   useEffect(() => {
     if (!modal) return;
-    const screenshots = Array.isArray(modal.project.screenshots) ? modal.project.screenshots.filter(Boolean) : [];
+    const screenshots = getProjectImages(modal.project);
     if (screenshots.length === 0) return;
     const onKey = (e) => {
       if (e.key === "Escape") setModal(null);
@@ -77,9 +77,15 @@ function SectionHeader() {
   );
 }
 
+function getProjectImages(project) {
+  const gallery = Array.isArray(project.screenshots) ? project.screenshots.filter(Boolean) : [];
+  const cover = project.image_url ? [project.image_url] : [];
+  return [...new Set([...gallery, ...cover])];
+}
+
 function WebCard({ project: p, onViewGallery }) {
   const techList = parseCSV(p.technologies);
-  const screenshots = Array.isArray(p.screenshots) ? p.screenshots.filter(Boolean) : (p.image_url ? [p.image_url] : []);
+  const screenshots = getProjectImages(p);
 
   return (
     <div className={`card project-card ${p.image_url ? 'has-media' : ''}`} style={{ height: "100%", minHeight: 300 }}>
@@ -139,7 +145,7 @@ function WebCard({ project: p, onViewGallery }) {
 function AppCard({ project: p, onViewGallery }) {
   const techList = parseCSV(p.technologies);
   const featureList = parseCSV(p.features);
-  const screenshots = Array.isArray(p.screenshots) ? p.screenshots.filter(Boolean) : [];
+  const screenshots = getProjectImages(p);
 
 
   return (
@@ -227,9 +233,7 @@ function AppCard({ project: p, onViewGallery }) {
 }
 
 function ScreenshotModal({ project: p, idx, setIdx, onClose }) {
-  const screenshots = Array.isArray(p.screenshots) && p.screenshots.filter(Boolean).length > 0 
-    ? p.screenshots.filter(Boolean) 
-    : (p.image_url ? [p.image_url] : []);
+  const screenshots = getProjectImages(p);
   const total = screenshots.length;
 
   return (

@@ -4,6 +4,25 @@ function tableFor(type) {
   return type === "app" ? "app_projects" : "web_projects";
 }
 
+function normalizeProjectPayload(project) {
+  const { type, id, created_at, updated_at, ...projectData } = project;
+
+  if (typeof projectData.screenshots === "string") {
+    projectData.screenshots = projectData.screenshots
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  if (!Array.isArray(projectData.screenshots)) {
+    projectData.screenshots = [];
+  }
+
+  return Object.fromEntries(
+    Object.entries(projectData).filter(([, value]) => value !== undefined)
+  );
+}
+
 export async function getProjects(type) {
   const table = tableFor(type);
   const { data, error } = await supabase
@@ -16,7 +35,7 @@ export async function getProjects(type) {
 
 export async function addProject(project) {
   const table = tableFor(project.type);
-  const { type, ...projectData } = project;
+  const projectData = normalizeProjectPayload(project);
   const { data, error } = await supabase
     .from(table)
     .insert([projectData])
@@ -28,7 +47,7 @@ export async function addProject(project) {
 
 export async function updateProject(id, project) {
   const table = tableFor(project.type);
-  const { type, ...projectData } = project;
+  const projectData = normalizeProjectPayload(project);
   const { data, error } = await supabase
     .from(table)
     .update(projectData)

@@ -9,6 +9,65 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");
 
+const STORAGE_BUCKET = "portfolio-images";
+
+function safeFileName(file, folder) {
+  const cleanFolder = (folder || "uploads").replace(/^\/+|\/+$/g, "");
+  const parts = file.name.split(".");
+  const fileExt = parts.length > 1 ? parts.pop().toLowerCase() : "file";
+  const baseName = parts.join(".")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 50) || "upload";
+
+  return `${cleanFolder}/${baseName}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
+}
+
+export async function uploadFile(file, folder = "uploads", options = {}) {
+  if (!file) return null;
+
+  const { accept = [], maxSizeMb = 15 } = options;
+  const allowed = Array.isArray(accept) ? accept : [accept];
+  const matchesType = allowed.length === 0 || allowed.some((type) => {
+    if (!type) return false;
+    if (type.endsWith("/*")) return file.type.startsWith(type.slice(0, -1));
+    return file.type === type;
+  });
+
+  if (!matchesType) {
+    throw new Error(`Please upload a valid ${allowed.join(" or ")} file.`);
+  }
+
+  if (file.size > maxSizeMb * 1024 * 1024) {
+    throw new Error(`File is too large. Maximum size is ${maxSizeMb}MB.`);
+  }
+
+  const fileName = safeFileName(file, folder);
+
+  const { error } = await supabase.storage
+    .from(STORAGE_BUCKET)
+    .upload(fileName, file, {
+      cacheControl: "3600",
+      upsert: true,
+      contentType: file.type || "application/octet-stream",
+    });
+
+  if (error) {
+    console.error("Upload error details:", error);
+    if (error.message === "The resource was not found") {
+      throw new Error(`Storage bucket "${STORAGE_BUCKET}" not found. Please create it as a public bucket in Supabase.`);
+    }
+    throw new Error(`Upload failed: ${error.message}`);
+  }
+
+  const { data: publicUrlData } = supabase.storage
+    .from(STORAGE_BUCKET)
+    .getPublicUrl(fileName);
+
+  return publicUrlData.publicUrl;
+}
+
 /**
  * Upload an image to Supabase Storage and return its public URL
  * @param {File} file 
@@ -16,29 +75,9 @@ export const supabase = createClient(supabaseUrl || "", supabaseAnonKey || "");
  * @returns {Promise<string>} public URL of the uploaded image
  */
 export async function uploadImage(file, folder = "uploads") {
-  if (!file) return null;
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${folder}/${Math.random().toString(36).substring(2, 12)}_${Date.now()}.${fileExt}`;
+  return uploadFile(file, folder, { accept: ["image/*"], maxSizeMb: 8 });
+}
 
-  const { error } = await supabase.storage
-    .from('portfolio-images')
-    .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false,
-      contentType: file.type
-    });
-
-  if (error) {
-    console.error('Upload error details:', error);
-    if (error.message === 'The resource was not found') {
-      throw new Error('Storage bucket "portfolio-images" not found. Please create it in your Supabase dashboard.');
-    }
-    throw new Error(`Upload failed: ${error.message}`);
-  }
-
-  const { data: publicUrlData } = supabase.storage
-    .from('portfolio-images')
-    .getPublicUrl(fileName);
-
-  return publicUrlData.publicUrl;
+export async function uploadPdf(file, folder = "cvs") {
+  return uploadFile(file, folder, { accept: ["application/pdf"], maxSizeMb: 12 });
 }

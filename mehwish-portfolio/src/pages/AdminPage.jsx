@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { getProfile, updateProfile } from "../services/profileService";
 import { getProjects, addProject, updateProject, deleteProject } from "../services/projectsService";
-import { uploadImage } from "../services/supabase";
+import { uploadImage, uploadPdf } from "../services/supabase";
 
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || "mehwish2024";
 
@@ -437,6 +437,21 @@ function ProfileTab({ profile, setProfile, showMsg }) {
     } finally { setSaving(false); }
   }
 
+  async function uploadCv(file) {
+    if (!file) return;
+    setCvUploading(true);
+    try {
+      const url = await uploadPdf(file, "cvs");
+      setForm((current) => ({ ...current, cv_url: url }));
+      showMsg("CV uploaded successfully!");
+    } catch (err) {
+      console.error("CV upload error:", err);
+      alert("CV upload failed: " + err.message);
+    } finally {
+      setCvUploading(false);
+    }
+  }
+
   const fields = [
     { l: "Full Name", k: "name", type: "text" },
     { l: "Profile Picture URL", k: "profile_pic", type: "url", full: true },
@@ -475,24 +490,9 @@ function ProfileTab({ profile, setProfile, showMsg }) {
                             {cvUploading ? "Uploading..." : "Upload PDF"}
                           </button>
                           <input
-                            type="file" accept=".pdf"
+                            type="file" accept="application/pdf,.pdf"
                             disabled={cvUploading}
-                            onChange={async (e) => {
-                              const file = e.target.files[0];
-                              if (file) {
-                                setCvUploading(true);
-                                try {
-                                  const url = await uploadImage(file, "cvs");
-                                  setForm({ ...form, cv_url: url });
-                                  showMsg("CV uploaded successfully!");
-                                } catch (err) { 
-                                  console.error("CV upload error:", err);
-                                  alert("CV upload failed: " + err.message); 
-                                } finally {
-                                  setCvUploading(false);
-                                }
-                              }
-                            }}
+                            onChange={(e) => uploadCv(e.target.files?.[0])}
                             style={{ position: "absolute", inset: 0, opacity: 0, cursor: cvUploading ? "default" : "pointer" }}
                           />
                         </div>
@@ -536,6 +536,7 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
   const [form, setForm] = useState({ ...EMPTY_PROJECT, type: "app" });
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
   const [screenshotInput, setScreenshotInput] = useState("");
 
   const allProjects = [...appProjects.map(p => ({...p, type: 'app'})), ...webProjects.map(p => ({...p, type: 'web'}))].sort((a, b) => parseInt(b.year || 0) - parseInt(a.year || 0));
@@ -546,7 +547,22 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
     setScreenshotInput("");
   }
   function removeScreenshot(i) {
-    setForm({ ...form, screenshots: form.screenshots.filter((_, idx) => idx !== i) });
+    setForm({ ...form, screenshots: (form.screenshots || []).filter((_, idx) => idx !== i) });
+  }
+
+  async function uploadProjectPicture(file) {
+    if (!file) return;
+    setGalleryUploading(true);
+    try {
+      const url = await uploadImage(file, "projects");
+      setForm((current) => ({ ...current, screenshots: [...(current.screenshots || []), url] }));
+      showMsg("Project picture uploaded!");
+    } catch (err) {
+      console.error("Project picture upload error:", err);
+      alert("Project picture upload failed: " + err.message);
+    } finally {
+      setGalleryUploading(false);
+    }
   }
 
   async function save() {
@@ -636,20 +652,19 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
             {form.type === "web" && <div><label className="admin-label">Live Link</label><input value={form.live_link || ""} onChange={(e) => setForm({ ...form, live_link: e.target.value })} placeholder="https://…" /></div>}
             <div><label className="admin-label">GitHub Link</label><input value={form.github_link || ""} onChange={(e) => setForm({ ...form, github_link: e.target.value })} placeholder="https://github.com/…" /></div>
             
-            {form.type === "web" && <ImageUploadField label="Image URL" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} showMsg={showMsg} folder="projects" />}
+            <ImageUploadField label="Project Cover Image" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} showMsg={showMsg} folder="projects" />
             
             <div>
               <label className="admin-label">Project Gallery (Screenshots/Pictures)</label>
               <div style={{ display: "flex", gap: 8 }}>
                 <input value={screenshotInput} onChange={(e) => setScreenshotInput(e.target.value)} placeholder="https://…" onKeyDown={(e) => e.key === "Enter" && addScreenshot()} style={{ flex: 1 }} />
-                <label className="btn-secondary" style={{ padding: "8px 14px", fontSize: 12, cursor: "pointer", display:"flex", alignItems:"center", whiteSpace:"nowrap" }}>
-                  Upload File
+                <label className="btn-secondary" style={{ padding: "8px 14px", fontSize: 12, cursor: galleryUploading ? "default" : "pointer", display:"flex", alignItems:"center", whiteSpace:"nowrap", opacity: galleryUploading ? 0.65 : 1 }}>
+                  {galleryUploading ? "Uploading..." : "Upload File"}
                   <input type="file" accept="image/*" onChange={async (e) => {
                     const file = e.target.files?.[0];
-                    if(!file) return;
-                    try { const url = await uploadImage(file, "projects"); setForm(f => ({...f, screenshots: [...(f.screenshots||[]), url]})); }
-                    catch(err) { alert(err.message); }
-                  }} style={{ display: "none" }} />
+                    await uploadProjectPicture(file);
+                    e.target.value = "";
+                  }} style={{ display: "none" }} disabled={galleryUploading} />
                 </label>
                 <button onClick={addScreenshot} className="btn-secondary" style={{ padding: "8px 14px", fontSize: 12, whiteSpace: "nowrap" }}>Add URL</button>
               </div>
@@ -783,6 +798,7 @@ function ImageUploadField({ label, value, onChange, circular, showMsg, folder = 
       alert("Image upload failed: " + err.message);
     } finally {
       setUploading(false);
+      e.target.value = "";
     }
   }
 
@@ -791,14 +807,23 @@ function ImageUploadField({ label, value, onChange, circular, showMsg, folder = 
       <label className="admin-label">{label}</label>
       <div style={{ display: "flex", gap: 8, flexDirection: "column" }}>
         {value ? (
-           <div style={{position:"relative", width:100, height:100}}>
-             <img src={value} style={{width:"100%", height:"100%", objectFit:"cover", borderRadius: circular ? "50%" : 8, border: circular ? "2px solid var(--red)" : "none"}} alt="" />
-             <button onClick={() => onChange("")} style={{position:"absolute", top:-5, right:-5, background:"var(--red)", color:"white", border:"none", borderRadius:"50%", width:24, height:24, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center"}}>×</button>
-           </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+            <div style={{position:"relative", width:100, height:100, flexShrink: 0}}>
+              <img src={value} style={{width:"100%", height:"100%", objectFit:"cover", borderRadius: circular ? "50%" : 8, border: circular ? "2px solid var(--red)" : "1px solid var(--border)"}} alt="" />
+              <button onClick={() => onChange("")} type="button" style={{position:"absolute", top:-5, right:-5, background:"var(--red)", color:"white", border:"none", borderRadius:"50%", width:24, height:24, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center"}}>×</button>
+            </div>
+            <div style={{ flex: "1 1 240px", minWidth: 0 }}>
+              <input value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder="https://..." style={{ marginBottom: 8 }} />
+              <label className="btn-secondary" style={{ padding: "8px 14px", fontSize: 12, cursor: uploading ? "default" : "pointer", display:"inline-flex", alignItems:"center", whiteSpace:"nowrap", opacity: uploading ? 0.65 : 1 }}>
+                {uploading ? "Uploading..." : "Replace File"}
+                <input type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} disabled={uploading}/>
+              </label>
+            </div>
+          </div>
         ) : (
-          <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <input value={value || ""} onChange={(e) => onChange(e.target.value)} placeholder="https://..." style={{ flex: 1, padding: "8px 12px", border: "1px solid rgba(255,255,255,0.1)", background: "var(--border)", borderRadius: 8, color: "var(--ink)" }} />
-            <label className="btn-secondary" style={{ padding: "8px 14px", fontSize: 12, cursor: "pointer", display:"flex", alignItems:"center", whiteSpace:"nowrap" }}>
+            <label className="btn-secondary" style={{ padding: "8px 14px", fontSize: 12, cursor: uploading ? "default" : "pointer", display:"flex", alignItems:"center", whiteSpace:"nowrap", opacity: uploading ? 0.65 : 1 }}>
               {uploading ? "Uploading..." : "Upload File"}
               <input type="file" accept="image/*" onChange={handleFile} style={{ display: "none" }} disabled={uploading}/>
             </label>
