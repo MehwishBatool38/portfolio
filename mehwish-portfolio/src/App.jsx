@@ -3,6 +3,7 @@ import Nav from "./components/Nav";
 import Footer from "./components/Footer";
 import Hero from "./components/Hero";
 import About from "./components/About";
+import Experience from "./components/Experience";
 import Projects from "./components/Projects";
 import Skills from "./components/Skills";
 import Contact from "./components/Contact";
@@ -381,7 +382,7 @@ export default function App() {
 
   useEffect(() => {
     if (page !== "home") return;
-    const sections = ["hero","about","projects","skills","contact"];
+    const sections = ["hero","about","experience","projects","skills","contact"];
     const obs = new IntersectionObserver(
       (entries) => { entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }); },
       { threshold: 0.2 }
@@ -436,6 +437,7 @@ export default function App() {
         <main>
           <Hero info={info} />
           <About info={info} />
+          <Experience />
           <Projects projects={projects} />
           <Skills />
           <Contact info={info} />
