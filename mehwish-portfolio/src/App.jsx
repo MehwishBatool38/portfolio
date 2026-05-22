@@ -382,7 +382,7 @@ export default function App() {
 
   useEffect(() => {
     if (page !== "home") return;
-    const sections = ["hero","about","experience","projects","skills","contact"];
+    const sections = ["hero","projects","skills","contact"];
     const obs = new IntersectionObserver(
       (entries) => { entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }); },
       { threshold: 0.2 }
@@ -436,15 +436,23 @@ export default function App() {
       {page === "home" && (
         <main>
           <Hero info={info} />
-          <About info={info} />
-          <Experience />
           <Projects projects={projects} />
           <Skills />
           <Contact info={info} />
         </main>
       )}
+      {page === "about" && (
+        <main>
+          <About info={info} />
+        </main>
+      )}
+      {page === "experience" && (
+        <main>
+          <Experience />
+        </main>
+      )}
       {page === "admin" && <AdminPage onBack={() => { setPage("home"); }} />}
-      {page === "home" && <Footer info={info} />}
+      {page !== "admin" && <Footer info={info} />}
 
       {showTop && (
         <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
