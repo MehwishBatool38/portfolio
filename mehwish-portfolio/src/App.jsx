@@ -349,23 +349,13 @@ textarea { resize: none; }
 }
 `;
 
-const pageFromPath = () => {
-  const path = window.location.pathname.replace(/\/$/, "");
-  if (path === "/about") return "about";
-  if (path === "/experience") return "experience";
-  if (path === "/admin") return "admin";
-  return "home";
-};
-
 const pathFromPage = (page) => {
-  if (page === "about") return "/about";
-  if (page === "experience") return "/experience";
   if (page === "admin") return "/admin";
   return "/";
 };
 
 export default function App() {
-  const [page, setPage] = useState(pageFromPath);
+  const [page, setPage] = useState(window.location.pathname.replace(/\/$/, "") === "/admin" ? "admin" : "home");
   const [active, setActive] = useState("hero");
   const [showTop, setShowTop] = useState(false);
   const [info, setInfo] = useState(DEFAULT_INFO);
@@ -389,7 +379,7 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const handlePop = () => setPage(pageFromPath());
+    const handlePop = () => setPage(window.location.pathname.replace(/\/$/, "") === "/admin" ? "admin" : "home");
     window.addEventListener("popstate", handlePop);
     return () => window.removeEventListener("popstate", handlePop);
   }, []);
@@ -403,7 +393,7 @@ export default function App() {
 
   useEffect(() => {
     if (page !== "home") return;
-    const sections = ["hero","projects","skills","contact"];
+    const sections = ["hero","about","experience","projects","skills","contact"];
     const obs = new IntersectionObserver(
       (entries) => { entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id); }); },
       { threshold: 0.2 }
@@ -466,19 +456,11 @@ export default function App() {
       {page === "home" && (
         <main>
           <Hero info={info} />
+          <About info={info} />
+          <Experience />
           <Projects projects={projects} />
           <Skills />
           <Contact info={info} />
-        </main>
-      )}
-      {page === "about" && (
-        <main>
-          <About info={info} />
-        </main>
-      )}
-      {page === "experience" && (
-        <main>
-          <Experience />
         </main>
       )}
       {page === "admin" && <AdminPage onBack={() => { changePage("home"); }} />}

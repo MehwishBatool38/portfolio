@@ -16,8 +16,8 @@ export default function Nav({ info, active, page, onPageChange }) {
   }, []);
 
   const links = [
-    { label: "About", page: "about", key: "about" },
-    { label: "Experience", page: "experience", key: "experience" },
+    { label: "About", href: "#about", key: "about" },
+    { label: "Experience", href: "#experience", key: "experience" },
     { label: "Projects", href: "#projects", key: "projects" },
     { label: "Skills", href: "#skills", key: "skills" },
     { label: "Contact", href: "#contact", key: "contact" },
@@ -26,11 +26,6 @@ export default function Nav({ info, active, page, onPageChange }) {
   const handleLink = (link) => {
     setOpen(false);
     if (link.key === "blog") { onPageChange("blog"); window.scrollTo({ top:0, behavior:"smooth" }); return; }
-    if (link.page) {
-      onPageChange(link.page);
-      window.scrollTo({ top:0, behavior:"smooth" });
-      return;
-    }
     if (page !== "home") {
       onPageChange("home");
       setTimeout(() => document.querySelector(link.href)?.scrollIntoView({ behavior:"smooth" }), 100);
@@ -65,7 +60,7 @@ export default function Nav({ info, active, page, onPageChange }) {
         <div className="nav-links-desktop" style={{ display:"flex", alignItems:"center", gap:36 }}>
           {links.map(l => (
             <button key={l.key} onClick={() => handleLink(l)}
-              className={`nav-link${active===l.key||page===l.page||(l.key==="blog"&&page==="blog")?" active":""}`}>
+              className={`nav-link${active===l.key||(l.key==="blog"&&page==="blog")?" active":""}`}>
               {l.label}
             </button>
           ))}
