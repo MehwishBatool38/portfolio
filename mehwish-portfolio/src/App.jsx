@@ -349,8 +349,23 @@ textarea { resize: none; }
 }
 `;
 
+const pageFromPath = () => {
+  const path = window.location.pathname.replace(/\/$/, "");
+  if (path === "/about") return "about";
+  if (path === "/experience") return "experience";
+  if (path === "/admin") return "admin";
+  return "home";
+};
+
+const pathFromPage = (page) => {
+  if (page === "about") return "/about";
+  if (page === "experience") return "/experience";
+  if (page === "admin") return "/admin";
+  return "/";
+};
+
 export default function App() {
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(pageFromPath);
   const [active, setActive] = useState("hero");
   const [showTop, setShowTop] = useState(false);
   const [info, setInfo] = useState(DEFAULT_INFO);
@@ -371,6 +386,12 @@ export default function App() {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const handlePop = () => setPage(pageFromPath());
+    window.addEventListener("popstate", handlePop);
+    return () => window.removeEventListener("popstate", handlePop);
   }, []);
 
   // Re-fetch data when returning to home page
@@ -426,12 +447,21 @@ export default function App() {
     return () => document.removeEventListener("mousemove", move);
   });
 
+  const changePage = (nextPage) => {
+    setPage(nextPage);
+    const nextPath = pathFromPage(nextPage);
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({}, "", nextPath);
+    }
+    window.scrollTo({ top: 0 });
+  };
+
   return (
     <>
       <style>{CSS}</style>
       <div id="cur-dot" className="cursor-dot" />
       <div id="cur-ring" className="cursor-ring" />
-      <Nav info={info} active={active} page={page} onPageChange={(p) => { setPage(p); window.scrollTo({ top: 0 }); }} />
+      <Nav info={info} active={active} page={page} onPageChange={changePage} />
 
       {page === "home" && (
         <main>
@@ -451,7 +481,7 @@ export default function App() {
           <Experience />
         </main>
       )}
-      {page === "admin" && <AdminPage onBack={() => { setPage("home"); }} />}
+      {page === "admin" && <AdminPage onBack={() => { changePage("home"); }} />}
       {page !== "admin" && <Footer info={info} />}
 
       {showTop && (
