@@ -31,16 +31,28 @@ const DEFAULT_INFO = {
 };
 
 const DEFAULT_PROJECTS = [
-  { id: 1, title: "Mini Calculator", description: "Sleek, responsive calculator featuring advanced mathematical functions.", type: "web", technologies: "JavaScript, HTML, CSS", image_url: "https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&q=80&w=800" },
-  { id: 2, title: "CGPA Calculator", description: "Academic performance tracking tool for university students.", type: "web", technologies: "JavaScript, React", image_url: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800" },
+  { id: 1, title: "Mini Calculator", description: "Sleek, responsive calculator featuring advanced mathematical functions.", type: "app", technologies: "JavaScript, HTML, CSS", image_url: "https://images.unsplash.com/photo-1587145820266-a5951ee6f620?auto=format&fit=crop&q=80&w=800" },
+  { id: 2, title: "CGPA Calculator", description: "Academic performance tracking tool for university students.", type: "app", technologies: "JavaScript, React", image_url: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=800" },
   { id: 3, title: "Dice App", description: "Interactive digital dice simulation with smooth animations.", type: "app", technologies: "Flutter, Dart", screenshots: ["https://images.unsplash.com/photo-1553481187-be93c21490a9?auto=format&fit=crop&q=80&w=800"] },
   { id: 4, title: "BMI Calculator", description: "Health tracking tool providing personalized fitness insights.", type: "app", technologies: "Flutter, Dart", screenshots: ["https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&q=80&w=800"] },
-  { id: 5, title: "Task Manager", description: "Productivity application for organizing daily workflows.", type: "web", technologies: "React, Node.js", image_url: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&q=80&w=800" },
+  { id: 5, title: "Task Manager", description: "Productivity application for organizing daily workflows.", type: "app", technologies: "React, Node.js", image_url: "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&q=80&w=800" },
   { id: 6, title: "Library Management", description: "System for book tracking and member registration.", type: "web", technologies: "SQL, Python", image_url: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=800" },
   { id: 7, title: "Gym Management", description: "Platform for membership tracking and workout scheduling.", type: "web", technologies: "SQL, React", image_url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=800" },
   { id: 8, title: "Fee Management", description: "System for tracking student fees and records.", type: "web", technologies: "React, Node.js", year: "2024", category: "In Progress", image_url: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=800" },
   { id: 9, title: "Car Showroom", description: "Inventory tracking system for vehicle dealerships.", type: "web", technologies: "SQL, Python", year: "2024", category: "In Progress", image_url: "https://images.unsplash.com/photo-1542362567-b05503f35259?auto=format&fit=crop&q=80&w=800" },
 ];
+
+const APP_PROJECT_TITLES = new Set([
+  "Mini Calculator",
+  "CGPA Calculator",
+  "Task Manager",
+]);
+
+function normalizeProjectType(project) {
+  return APP_PROJECT_TITLES.has(project.title)
+    ? { ...project, type: "app" }
+    : project;
+}
 
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600&display=swap');
@@ -367,8 +379,8 @@ export default function App() {
     ]);
     if (prof) setInfo(prof);
     const allProjects = [
-      ...app.map(p => ({ ...p, type: "app" })),
-      ...web.map(p => ({ ...p, type: "web" }))
+      ...app.map(p => normalizeProjectType({ ...p, type: "app" })),
+      ...web.map(p => normalizeProjectType({ ...p, type: "web" }))
     ].sort((a, b) => parseInt(b.year || 0) - parseInt(a.year || 0));
     
     setProjects(allProjects.length > 0 ? allProjects : DEFAULT_PROJECTS);
