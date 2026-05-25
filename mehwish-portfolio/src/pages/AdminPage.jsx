@@ -4,6 +4,7 @@ import { getProjects, addProject, updateProject, deleteProject } from "../servic
 import { uploadImage, uploadPdf } from "../services/supabase";
 
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || "mehwish2024";
+const OVERRIDE_APP_PROJECTS = ["cgpa calculator", "task manager", "mini calculator"];
 
 const EMPTY_PROJECT = {
   type: "app", title: "", description: "", technologies: "", live_link: "", github_link: "",
@@ -54,13 +55,13 @@ const ADMIN_CSS = `
 .admin-section-head p { font-size:13px; color:var(--muted); }
 .admin-item {
   padding:16px 18px; border-radius:12px; background:#fff;
-  border:1px solid var(--border); display:flex; align-items:center; gap:14px; justify-content:space-between;
+  border:1px solid var(--border); display:flex; align-items:center; gap:14px; position:relative; padding-right:170px;
 }
 .admin-item:hover { background:var(--cream2); border-color:var(--ink); }
 .admin-item-left { display:flex; gap:14px; align-items:center; min-width:0; flex:1; }
 .admin-item-title { font-family:var(--font-body); font-size:14px; font-weight:700; color:var(--ink); }
 .admin-item-sub { font-size:11px; color:var(--muted); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .admin-item-actions { display:flex; gap:8px; flex-shrink:0; margin-left:12px; min-width:140px; justify-content:flex-end; }
+.admin-item-actions { position:absolute; right:18px; top:50%; transform:translateY(-50%); display:flex; gap:8px; flex-shrink:0; min-width:140px; justify-content:flex-end; }
 .admin-btn-edit {
   padding:5px 12px; border-radius:8px; background:var(--cream2);
   border:1px solid var(--border); color:var(--ink); font-size:11px; cursor:pointer; font-weight:600; flex-shrink:0;
@@ -132,7 +133,8 @@ const ADMIN_CSS = `
   .admin-form-grid { grid-template-columns:1fr; }
   .admin-grid-2 { grid-template-columns:1fr; }
   .admin-grid-3 { grid-template-columns:1fr; }
-  .admin-item { padding:14px 12px; gap:10px; }
+  .admin-item { padding:14px 12px; gap:10px; padding-right:18px; }
+  .admin-item-actions { position: static; transform: none; margin-left:auto; min-width:0; }
   .admin-btn-edit, .admin-btn-delete { padding:5px 10px; font-size:10px; }
 }
 @media (min-width: 769px) {
@@ -170,14 +172,13 @@ export default function AdminPage({ onBack }) {
       available: true, years_exp: 2, projects_count: 14,
     });
     // Ensure known apps stored incorrectly as websites are treated as apps
-    const specialAppNames = ["cgpa calculator", "task manager", "mini calculator"];
     const webList = Array.isArray(web) ? web : [];
     const appList = Array.isArray(app) ? app : [];
 
-    const moved = webList.filter((p) => specialAppNames.includes((p.title || "").toLowerCase().trim()))
+    const moved = webList.filter((p) => OVERRIDE_APP_PROJECTS.includes((p.title || "").toLowerCase().trim()))
       .map((p) => ({ ...p, type: "app" }));
 
-    const filteredWeb = webList.filter((p) => !specialAppNames.includes((p.title || "").toLowerCase().trim()));
+    const filteredWeb = webList.filter((p) => !OVERRIDE_APP_PROJECTS.includes((p.title || "").toLowerCase().trim()));
 
     setWebProjects(filteredWeb);
     setAppProjects([...appList, ...moved]);
@@ -716,7 +717,7 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
                   <div style={{ minWidth: 0 }}>
                     <div className="admin-item-title">{p.title}</div>
                     <div className="admin-item-sub">
-                       {p.type === 'app' ? '📱 Mobile App' : '🌐 Web Project'} · {p.year}
+                       {(OVERRIDE_APP_PROJECTS.includes((p.title || "").trim().toLowerCase()) ? '📱 Mobile App' : p.type === 'app' ? '📱 Mobile App' : '🌐 Web Project')} · {p.year}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.description || p.tagline}</div>
                   </div>
