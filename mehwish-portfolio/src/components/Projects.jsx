@@ -6,6 +6,15 @@ function parseCSV(value) {
   return [];
 }
 
+function isAppProject(project) {
+  const title = (project.title || "").toLowerCase();
+  return (
+    (title.includes("mini") && title.includes("calculat")) ||
+    (title.includes("cgpa") && title.includes("calculat")) ||
+    (title.includes("task") && title.includes("manag"))
+  );
+}
+
 export default function Projects({ projects }) {
   const [modal, setModal] = useState(null);
 
@@ -44,10 +53,11 @@ export default function Projects({ projects }) {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 32 }}>
           {projects.map((p) => {
-            if (p.type === "app") {
-              return <AppCard key={`app-${p.id}`} project={p} onViewGallery={(idx) => setModal({ project: p, idx: idx || 0 })} />;
+            const project = isAppProject(p) ? { ...p, type: "app" } : p;
+            if (project.type === "app") {
+              return <AppCard key={`app-${project.id}`} project={project} onViewGallery={(idx) => setModal({ project, idx: idx || 0 })} />;
             } else {
-              return <WebCard key={`web-${p.id}`} project={p} onViewGallery={(idx) => setModal({ project: p, idx: idx || 0 })} />;
+              return <WebCard key={`web-${project.id}`} project={project} onViewGallery={(idx) => setModal({ project, idx: idx || 0 })} />;
             }
           })}
         </div>

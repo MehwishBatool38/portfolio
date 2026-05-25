@@ -130,6 +130,9 @@ const ADMIN_CSS = `
   .admin-form-grid { grid-template-columns:1fr; }
   .admin-grid-2 { grid-template-columns:1fr; }
   .admin-grid-3 { grid-template-columns:1fr; }
+  .admin-item { flex-wrap:wrap; }
+  .admin-item > div:last-child { flex-basis:100%; margin-top:8px; display:flex; gap:6px; }
+  .admin-btn-edit, .admin-btn-delete { flex:1; }
 }
 @media (min-width: 769px) {
   .admin-mobile-nav { display:none !important; }

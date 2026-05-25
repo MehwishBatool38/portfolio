@@ -42,14 +42,14 @@ const DEFAULT_PROJECTS = [
   { id: 9, title: "Car Showroom", description: "Inventory tracking system for vehicle dealerships.", type: "web", technologies: "SQL, Python", year: "2024", category: "In Progress", image_url: "https://images.unsplash.com/photo-1542362567-b05503f35259?auto=format&fit=crop&q=80&w=800" },
 ];
 
-const APP_PROJECT_TITLES = new Set([
-  "Mini Calculator",
-  "CGPA Calculator",
-  "Task Manager",
-]);
-
 function normalizeProjectType(project) {
-  return APP_PROJECT_TITLES.has(project.title)
+  const title = (project.title || "").toLowerCase();
+  const isAppProject =
+    (title.includes("mini") && title.includes("calculat")) ||
+    (title.includes("cgpa") && title.includes("calculat")) ||
+    (title.includes("task") && title.includes("manag"));
+
+  return isAppProject
     ? { ...project, type: "app" }
     : project;
 }
