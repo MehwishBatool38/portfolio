@@ -60,7 +60,7 @@ const ADMIN_CSS = `
 .admin-item-left { display:flex; gap:14px; align-items:center; min-width:0; flex:1; }
 .admin-item-title { font-family:var(--font-body); font-size:14px; font-weight:700; color:var(--ink); }
 .admin-item-sub { font-size:11px; color:var(--muted); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.admin-item-actions { display:flex; gap:8px; flex-shrink:0; margin-left:12px; }
+  .admin-item-actions { display:flex; gap:8px; flex-shrink:0; margin-left:12px; min-width:140px; justify-content:flex-end; }
 .admin-btn-edit {
   padding:5px 12px; border-radius:8px; background:var(--cream2);
   border:1px solid var(--border); color:var(--ink); font-size:11px; cursor:pointer; font-weight:600; flex-shrink:0;
@@ -169,8 +169,18 @@ export default function AdminPage({ onBack }) {
       github: "https://github.com/mehwish-batool", profile_pic: "", cv_url: "",
       available: true, years_exp: 2, projects_count: 14,
     });
-    setWebProjects(web);
-    setAppProjects(app);
+    // Ensure known apps stored incorrectly as websites are treated as apps
+    const specialAppNames = ["cgpa calculator", "task manager", "mini calculator"];
+    const webList = Array.isArray(web) ? web : [];
+    const appList = Array.isArray(app) ? app : [];
+
+    const moved = webList.filter((p) => specialAppNames.includes((p.title || "").toLowerCase().trim()))
+      .map((p) => ({ ...p, type: "app" }));
+
+    const filteredWeb = webList.filter((p) => !specialAppNames.includes((p.title || "").toLowerCase().trim()));
+
+    setWebProjects(filteredWeb);
+    setAppProjects([...appList, ...moved]);
     setLoading(false);
   }
 
