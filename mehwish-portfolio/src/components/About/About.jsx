@@ -1,6 +1,7 @@
 
 import PropTypes from "prop-types";
 
+const ABOUT_INTRO = "Welcome to my portfolio";
 const ABOUT_SUMMARY =
   "Software Engineering student at COMSATS and a full-stack web developer passionate about crafting seamless web experiences. Skilled in both frontend and backend technologies, with additional expertise in Flutter for mobile development. Eager to build innovative digital products that make a difference.";
 
@@ -20,7 +21,7 @@ function About({ info }) {
           {/* Left */}
           <div>
             <p style={{ fontSize:20, fontFamily:"var(--font-serif)", fontStyle:"italic", color:"var(--ink2)", lineHeight:1.75, marginBottom:40 }} className="rv">
-              "{info?.bio}"
+              "{info?.bio || ABOUT_INTRO}"
             </p>
             <p style={{ fontSize:16, color:"var(--ink)", lineHeight:1.6, marginBottom:40 }} className="rv">{ABOUT_SUMMARY}</p>
             <hr className="hr" style={{ marginBottom:36 }} />
