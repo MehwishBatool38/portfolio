@@ -1,5 +1,7 @@
 
-export default function About({ info }) {
+import PropTypes from "prop-types";
+
+function About({ info }) {
   return (
     <section id="about" className="section" style={{ borderTop:"1px solid var(--border)" }}>
       <div className="container">
@@ -52,3 +54,16 @@ export default function About({ info }) {
     </section>
   );
 }
+
+About.propTypes = {
+  info: PropTypes.shape({
+    bio: PropTypes.string,
+    university: PropTypes.string,
+    location: PropTypes.string,
+    email: PropTypes.string,
+    years_exp: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    github: PropTypes.string,
+  }),
+};
+
+export default About;
