@@ -130,9 +130,10 @@ const ADMIN_CSS = `
   .admin-form-grid { grid-template-columns:1fr; }
   .admin-grid-2 { grid-template-columns:1fr; }
   .admin-grid-3 { grid-template-columns:1fr; }
-  .admin-item { flex-wrap:wrap; }
-  .admin-item > div:last-child { flex-basis:100%; margin-top:8px; display:flex; gap:6px; }
-  .admin-btn-edit, .admin-btn-delete { flex:1; }
+  .admin-item { gap:10px; align-items:flex-end; }
+  .admin-item > div:nth-child(2) { min-width:0; flex:1; }
+  .admin-item > div:last-child { display:flex; gap:6px; flex-shrink:0; }
+  .admin-btn-edit, .admin-btn-delete { padding:5px 10px; font-size:10px; flex-shrink:0; }
 }
 @media (min-width: 769px) {
   .admin-mobile-nav { display:none !important; }
