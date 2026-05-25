@@ -64,13 +64,13 @@ const ADMIN_CSS = `
 .admin-section-head p { font-size:13px; color:var(--muted); }
 .admin-item {
   padding:16px 18px; border-radius:12px; background:#fff;
-  border:1px solid var(--border); display:flex; align-items:center; gap:14px; position:relative; padding-right:170px;
+  border:1px solid var(--border); display:flex; align-items:center; gap:14px; min-width:0;
 }
 .admin-item:hover { background:var(--cream2); border-color:var(--ink); }
 .admin-item-left { display:flex; gap:14px; align-items:center; min-width:0; flex:1; }
 .admin-item-title { font-family:var(--font-body); font-size:14px; font-weight:700; color:var(--ink); }
 .admin-item-sub { font-size:11px; color:var(--muted); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.admin-item-actions { position:absolute; right:18px; top:50%; transform:translateY(-50%); display:flex; gap:8px; flex-shrink:0; min-width:140px; justify-content:flex-end; }
+.admin-item-actions { display:flex; gap:8px; flex-shrink:0; min-width:140px; justify-content:flex-end; margin-left:auto; }
 .admin-btn-edit {
   padding:5px 12px; border-radius:8px; background:var(--cream2);
   border:1px solid var(--border); color:var(--ink); font-size:11px; cursor:pointer; font-weight:600; flex-shrink:0;
@@ -84,7 +84,7 @@ const ADMIN_CSS = `
 }
 .admin-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 .admin-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
-.admin-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:36px; align-items:start; }
+.admin-form-grid { display:grid; grid-template-columns:minmax(0, 1.05fr) minmax(340px, 0.95fr); gap:28px; align-items:start; }
 .admin-success-toast {
   position:fixed; top:80px; right:24px; z-index:200;
   padding:12px 20px; border-radius:10px; background:var(--ink);
@@ -143,8 +143,11 @@ const ADMIN_CSS = `
   .admin-grid-2 { grid-template-columns:1fr; }
   .admin-grid-3 { grid-template-columns:1fr; }
   .admin-item { padding:14px 12px; gap:10px; padding-right:18px; }
-  .admin-item-actions { position: static; transform: none; margin-left:auto; min-width:0; }
+  .admin-item-actions { margin-left:auto; min-width:0; }
   .admin-btn-edit, .admin-btn-delete { padding:5px 10px; font-size:10px; }
+}
+@media (max-width: 1180px) {
+  .admin-form-grid { grid-template-columns:1fr; }
 }
 @media (min-width: 769px) {
   .admin-mobile-nav { display:none !important; }
@@ -731,7 +734,7 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
                     <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.description || p.tagline}</div>
                   </div>
                 </div>
-                <div className="admin-item-actions" style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 8, flexShrink: 0, minWidth: 140, justifyContent: 'flex-end' }}>
+                <div className="admin-item-actions">
                   <button onClick={() => startEdit(p)} className="admin-btn-edit">Edit</button>
                   <button onClick={() => remove(p.id, p.type)} className="admin-btn-delete">Delete</button>
                 </div>

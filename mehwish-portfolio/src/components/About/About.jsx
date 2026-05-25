@@ -1,6 +1,9 @@
 
 import PropTypes from "prop-types";
 
+const ABOUT_SUMMARY =
+  "Software Engineering student at COMSATS and a full-stack web developer passionate about crafting seamless web experiences. Skilled in both frontend and backend technologies, with additional expertise in Flutter for mobile development. Eager to build innovative digital products that make a difference.";
+
 function About({ info }) {
   return (
     <section id="about" className="section" style={{ borderTop:"1px solid var(--border)" }}>
@@ -19,7 +22,7 @@ function About({ info }) {
             <p style={{ fontSize:20, fontFamily:"var(--font-serif)", fontStyle:"italic", color:"var(--ink2)", lineHeight:1.75, marginBottom:40 }} className="rv">
               "{info?.bio}"
             </p>
-            <p style={{ fontSize:16, color:"var(--ink)", lineHeight:1.6, marginBottom:40 }} className="rv">Software Engineering student at COMSATS and a full-stack web developer passionate about crafting seamless web experiences. Skilled in both frontend and backend technologies, with additional expertise in Flutter for mobile development. Eager to build innovative digital products that make a difference.</p>
+            <p style={{ fontSize:16, color:"var(--ink)", lineHeight:1.6, marginBottom:40 }} className="rv">{ABOUT_SUMMARY}</p>
             <hr className="hr" style={{ marginBottom:36 }} />
             <div className="about-info-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:0 }}>
               {[
