@@ -6,6 +6,15 @@ import { uploadImage, uploadPdf } from "../services/supabase";
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS || "mehwish2024";
 const OVERRIDE_APP_PROJECTS = ["cgpa calculator", "task manager", "mini calculator"];
 
+function normalizeProjectTitle(title) {
+  return (title || "").toLowerCase().replace(/[^a-z0-9]+/g, "").trim();
+}
+
+function isOverrideAppProject(title) {
+  const normalizedTitle = normalizeProjectTitle(title);
+  return OVERRIDE_APP_PROJECTS.some((name) => normalizeProjectTitle(name) === normalizedTitle);
+}
+
 const EMPTY_PROJECT = {
   type: "app", title: "", description: "", technologies: "", live_link: "", github_link: "",
   image_url: "", category: "", year: new Date().getFullYear().toString(), color: "#0ea5e9",
@@ -175,10 +184,9 @@ export default function AdminPage({ onBack }) {
     const webList = Array.isArray(web) ? web : [];
     const appList = Array.isArray(app) ? app : [];
 
-    const moved = webList.filter((p) => OVERRIDE_APP_PROJECTS.includes((p.title || "").toLowerCase().trim()))
-      .map((p) => ({ ...p, type: "app" }));
+    const moved = webList.filter((p) => isOverrideAppProject(p.title)).map((p) => ({ ...p, type: "app" }));
 
-    const filteredWeb = webList.filter((p) => !OVERRIDE_APP_PROJECTS.includes((p.title || "").toLowerCase().trim()));
+    const filteredWeb = webList.filter((p) => !isOverrideAppProject(p.title));
 
     setWebProjects(filteredWeb);
     setAppProjects([...appList, ...moved]);
@@ -554,7 +562,8 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
   const [galleryUploading, setGalleryUploading] = useState(false);
   const [screenshotInput, setScreenshotInput] = useState("");
 
-  const allProjects = [...appProjects.map(p => ({...p, type: 'app'})), ...webProjects.map(p => ({...p, type: 'web'}))].sort((a, b) => parseInt(b.year || 0) - parseInt(a.year || 0));
+  const allProjects = [...appProjects.map(p => ({...p, type: 'app'})), ...webProjects.map(p => ({...p, type: isOverrideAppProject(p.title) ? 'app' : 'web'}))]
+    .sort((a, b) => parseInt(b.year || 0) - parseInt(a.year || 0));
 
   function addScreenshot() {
     if (!screenshotInput.trim()) return;
@@ -717,12 +726,12 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
                   <div style={{ minWidth: 0 }}>
                     <div className="admin-item-title">{p.title}</div>
                     <div className="admin-item-sub">
-                       {(OVERRIDE_APP_PROJECTS.includes((p.title || "").trim().toLowerCase()) ? '📱 Mobile App' : p.type === 'app' ? '📱 Mobile App' : '🌐 Web Project')} · {p.year}
+                       {(isOverrideAppProject(p.title) || p.type === 'app') ? '📱 Mobile App' : '🌐 Web Project'} · {p.year}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.description || p.tagline}</div>
                   </div>
                 </div>
-                <div className="admin-item-actions">
+                <div className="admin-item-actions" style={{ position: 'absolute', right: 18, top: '50%', transform: 'translateY(-50%)', display: 'flex', gap: 8, flexShrink: 0, minWidth: 140, justifyContent: 'flex-end' }}>
                   <button onClick={() => startEdit(p)} className="admin-btn-edit">Edit</button>
                   <button onClick={() => remove(p.id, p.type)} className="admin-btn-delete">Delete</button>
                 </div>
