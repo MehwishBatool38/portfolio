@@ -57,14 +57,16 @@ const ADMIN_CSS = `
   border:1px solid var(--border); display:flex; align-items:center; gap:14px; justify-content:space-between;
 }
 .admin-item:hover { background:var(--cream2); border-color:var(--ink); }
+.admin-item-left { display:flex; gap:14px; align-items:center; min-width:0; flex:1; }
 .admin-item-title { font-family:var(--font-body); font-size:14px; font-weight:700; color:var(--ink); }
-.admin-item-sub { font-size:11px; color:var(--muted); margin-top:3px; }
+.admin-item-sub { font-size:11px; color:var(--muted); margin-top:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.admin-item-actions { display:flex; gap:8px; flex-shrink:0; margin-left:12px; }
 .admin-btn-edit {
-  padding:5px 14px; border-radius:8px; background:var(--cream2);
+  padding:5px 12px; border-radius:8px; background:var(--cream2);
   border:1px solid var(--border); color:var(--ink); font-size:11px; cursor:pointer; font-weight:600; flex-shrink:0;
 }
 .admin-btn-delete {
-  padding:5px 14px; border-radius:8px; background:#FFEBEB;
+  padding:5px 12px; border-radius:8px; background:#FFEBEB;
   border:1px solid #FFCDCD; color:var(--red); font-size:11px; cursor:pointer; font-weight:600; flex-shrink:0;
 }
 .admin-btn-publish {
@@ -697,17 +699,19 @@ function ProjectsTab({ webProjects, appProjects, setWebProjects, setAppProjects,
           <div style={{ display: "flex", flexDirection: "column", gap: 10, maxHeight: 650, overflowY: "auto" }}>
             {allProjects.map((p) => (
               <div key={`${p.type}-${p.id}`} className="admin-item">
-                <div style={{ width: 44, height: 44, borderRadius: 8, background: "var(--cream2)", overflow: "hidden", flexShrink: 0, border: "1px solid var(--border)" }}>
-                  <img src={p.image_url || (p.screenshots?.[0]) || "https://placehold.co/100x100?text=No+Image"} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="admin-item-title">{p.title}</div>
-                  <div className="admin-item-sub">
-                     {p.type === 'app' ? '📱 Mobile App' : '🌐 Web Project'} · {p.year}
+                <div className="admin-item-left">
+                  <div style={{ width: 44, height: 44, borderRadius: 8, background: "var(--cream2)", overflow: "hidden", flexShrink: 0, border: "1px solid var(--border)" }}>
+                    <img src={p.image_url || (p.screenshots?.[0]) || "https://placehold.co/100x100?text=No+Image"} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   </div>
-                  <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.description || p.tagline}</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="admin-item-title">{p.title}</div>
+                    <div className="admin-item-sub">
+                       {p.type === 'app' ? '📱 Mobile App' : '🌐 Web Project'} · {p.year}
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--muted)", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.description || p.tagline}</div>
+                  </div>
                 </div>
-                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <div className="admin-item-actions">
                   <button onClick={() => startEdit(p)} className="admin-btn-edit">Edit</button>
                   <button onClick={() => remove(p.id, p.type)} className="admin-btn-delete">Delete</button>
                 </div>
